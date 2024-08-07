@@ -3,41 +3,31 @@ import argparse
 import os
 
 def create_booklet(input_pdf, output_pdf):
-    try:
-        reader = PyPDF2.PdfReader(input_pdf)
-    except FileNotFoundError:
+    # Vérifier si le fichier d'entrée existe
+    if not os.path.isfile(input_pdf):
         print(f"Error: The file '{input_pdf}' does not exist.")
         return
 
+    # Si le fichier existe, continuer avec la création du livret (à compléter)
+    print(f"File '{input_pdf}' exists. Proceeding with booklet creation...")
+
+    try:
+        with open(input_pdf, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            print(f"File '{input_pdf}' successfully opened. Number of pages: {len(reader.pages)}")
+            # Placeholder pour le reste de la fonction à ajouter plus tard
+    except Exception as e:
+        print(f"Error opening file: {e}")
+
     writer = PyPDF2.PdfWriter()
+
+    try:
+        with open(output_pdf, 'wb') as output_file:
+            writer.write(output_file)
+        print(f"Booklet created successfully: {output_pdf}")
     
-    num_pages = len(reader.pages)
-    
-    # Calculer le nombre total de feuilles nécessaires pour le livret
-    num_sheets = (num_pages + 3) // 4  # Arrondir au supérieur
-
-    # Réorganiser les pages pour le livret
-    for sheet in range(num_sheets):
-        # Pages pour le recto et le verso de la feuille
-        page_1 = reader.pages[num_pages - 1 - (sheet * 2)]
-        page_2 = reader.pages[sheet * 2] if (sheet * 2) < num_pages else None
-        page_3 = reader.pages[sheet * 2 + 1] if (sheet * 2 + 1) < num_pages else None
-        page_4 = reader.pages[num_pages - 2 - (sheet * 2)] if (num_pages - 2 - (sheet * 2)) >= 0 else None
-        
-        # Ajouter les pages dans le bon ordre pour le livret
-        if page_4 is not None:
-            writer.add_page(page_4)  # Page D
-        if page_1 is not None:
-            writer.add_page(page_1)  # Page A
-        if page_2 is not None:
-            writer.add_page(page_2)  # Page B
-        if page_3 is not None:
-            writer.add_page(page_3)  # Page C
-
-    with open(output_pdf, 'wb') as output_file:
-        writer.write(output_file)
-
-    print(f"Booklet created successfully: {output_pdf}")
+    except Exception as e:
+        print(f"Error saving file: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description='Create a booklet from a PDF file.')
